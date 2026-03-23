@@ -1,0 +1,8 @@
+app.delete("/users/:id", (req, res) => {
+  const { id } = req.params;
+
+  db.query("DELETE FROM users WHERE id=?", [id], (err, result) => {
+    if (err) return res.send(err);
+    res.send("User deleted");
+  });
+});
