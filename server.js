@@ -1,3 +1,14 @@
+const http = require("http");
+
+const server = http.createServer((req, res) => {
+  res.write("Hello from Node server");
+  res.end();
+});
+
+server.listen(3000);
+
+//
+
 const express = require("express");
 const app = express();
 
