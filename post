@@ -1,0 +1,11 @@
+app.put("/users/:id", (req, res) => {
+  const { name, age } = req.body;
+  const { id } = req.params;
+
+  const sql = "UPDATE users SET name=?, age=? WHERE id=?";
+  
+  db.query(sql, [name, age, id], (err, result) => {
+    if (err) return res.send(err);
+    res.send("User updated");
+  });
+});
