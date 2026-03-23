@@ -1,3 +1,4 @@
+// connect node with sql
 const express = require("express");
 const mysql = require("mysql2");
 
