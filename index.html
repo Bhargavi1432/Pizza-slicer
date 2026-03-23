@@ -16,25 +16,41 @@
   <ul id="usersList"></ul>
 
   <script>
-    // 📌 Fetch users
+    console.log("Script loaded");
+
+    // 🔵 Get all users
     async function getUsers() {
-      const res = await fetch("http://localhost:3000/users");
-      const data = await res.json();
+      try {
+        console.log("Fetching users...");
 
-      const list = document.getElementById("usersList");
-      list.innerHTML = "";
+        const res = await fetch("http://localhost:3000/users");
+        const data = await res.json();
 
-      data.forEach(user => {
-        const li = document.createElement("li");
-        li.innerText = user.name + " (" + user.age + ")";
-        list.appendChild(li);
-      });
+        console.log("Data:", data);
+
+        const list = document.getElementById("usersList");
+        list.innerHTML = "";
+
+        data.forEach(user => {
+          const li = document.createElement("li");
+          li.innerText = user.name + " (" + user.age + ")";
+          list.appendChild(li);
+        });
+
+      } catch (err) {
+        console.log("ERROR:", err);
+      }
     }
 
-    // 📌 Add user
+    // 🟢 Add user
     async function addUser() {
       const name = document.getElementById("name").value;
       const age = document.getElementById("age").value;
+
+      if (!name || !age) {
+        alert("Please enter all fields");
+        return;
+      }
 
       await fetch("http://localhost:3000/users", {
         method: "POST",
@@ -44,11 +60,16 @@
         body: JSON.stringify({ name, age })
       });
 
-      getUsers(); // refresh list
+      // Clear inputs
+      document.getElementById("name").value = "";
+      document.getElementById("age").value = "";
+
+      // Refresh list
+      getUsers();
     }
 
-    // Load users on page start
-    getUsers();
+    // 🔥 Load data when page opens
+    window.onload = getUsers;
   </script>
 
 </body>
