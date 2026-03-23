@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>User App</title>
+</head>
+<body>
+
+  <h2>Add User</h2>
+
+  <input type="text" id="name" placeholder="Enter name"><br><br>
+  <input type="number" id="age" placeholder="Enter age"><br><br>
+
+  <button onclick="addUser()">Add User</button>
+
+  <h2>Users List</h2>
+  <ul id="usersList"></ul>
+
+  <script>
+    // 📌 Fetch users
+    async function getUsers() {
+      const res = await fetch("http://localhost:3000/users");
+      const data = await res.json();
+
+      const list = document.getElementById("usersList");
+      list.innerHTML = "";
+
+      data.forEach(user => {
+        const li = document.createElement("li");
+        li.innerText = user.name + " (" + user.age + ")";
+        list.appendChild(li);
+      });
+    }
+
+    // 📌 Add user
+    async function addUser() {
+      const name = document.getElementById("name").value;
+      const age = document.getElementById("age").value;
+
+      await fetch("http://localhost:3000/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ name, age })
+      });
+
+      getUsers(); // refresh list
+    }
+
+    // Load users on page start
+    getUsers();
+  </script>
+
+</body>
+</html>
