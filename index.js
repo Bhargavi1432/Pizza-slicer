@@ -21,3 +21,7 @@ db.connect((err) => {
     console.log("✅ Connected to MySQL");
   }
 });
+
+app.listen(3000, () => {
+  console.log("🚀 Server running on port 3000");
+});
