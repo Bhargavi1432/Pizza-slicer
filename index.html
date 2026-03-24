@@ -5,70 +5,97 @@
 </head>
 <body>
 
-  <h2>Add User</h2>
+  <h2>Add / Edit User</h2>
 
   <input type="text" id="name" placeholder="Enter name"><br><br>
   <input type="number" id="age" placeholder="Enter age"><br><br>
 
-  <button onclick="addUser()">Add User</button>
+  <button onclick="saveUser()">Save User</button>
 
   <h2>Users List</h2>
   <ul id="usersList"></ul>
 
   <script>
-    console.log("Script loaded");
+    let editId = null; // 🔥 track edit mode
 
-    // 🔵 Get all users
+    // 🔵 Get users
     async function getUsers() {
-      try {
-        console.log("Fetching users...");
+      const res = await fetch("http://localhost:3000/users");
+      const data = await res.json();
 
-        const res = await fetch("http://localhost:3000/users");
-        const data = await res.json();
+      const list = document.getElementById("usersList");
+      list.innerHTML = "";
 
-        console.log("Data:", data);
+      data.forEach(user => {
+        const li = document.createElement("li");
 
-        const list = document.getElementById("usersList");
-        list.innerHTML = "";
+        li.innerHTML = `
+          ${user.name} (${user.age})
+          <button onclick="editUser(${user.id}, '${user.name}', ${user.age})">✏️</button>
+          <button onclick="deleteUser(${user.id})">❌</button>
+        `;
 
-        data.forEach(user => {
-          const li = document.createElement("li");
-          li.innerText = user.name + " (" + user.age + ")";
-          list.appendChild(li);
-        });
-
-      } catch (err) {
-        console.log("ERROR:", err);
-      }
+        list.appendChild(li);
+      });
     }
 
-    // 🟢 Add user
-    async function addUser() {
+    // 🟢 Add OR Update user
+    async function saveUser() {
       const name = document.getElementById("name").value;
       const age = document.getElementById("age").value;
 
       if (!name || !age) {
-        alert("Please enter all fields");
+        alert("Fill all fields");
         return;
       }
 
-      await fetch("http://localhost:3000/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ name, age })
-      });
+      if (editId === null) {
+        // ➕ CREATE
+        await fetch("http://localhost:3000/users", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ name, age })
+        });
+      } else {
+        // ✏️ UPDATE
+        await fetch(`http://localhost:3000/users/${editId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ name, age })
+        });
+
+        editId = null; // reset
+      }
 
       // Clear inputs
       document.getElementById("name").value = "";
       document.getElementById("age").value = "";
 
-      // Refresh list
       getUsers();
     }
 
-    // 🔥 Load data when page opens
+    // ✏️ Fill form for editing
+    function editUser(id, name, age) {
+      document.getElementById("name").value = name;
+      document.getElementById("age").value = age;
+
+      editId = id;
+    }
+
+    // ❌ Delete user
+    async function deleteUser(id) {
+      await fetch(`http://localhost:3000/users/${id}`, {
+        method: "DELETE"
+      });
+
+      getUsers();
+    }
+
+    // Load users on start
     window.onload = getUsers;
   </script>
 
